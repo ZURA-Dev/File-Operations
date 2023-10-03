@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <cstdio>
 // for testing delete later
 #include <vector>
 // todos
@@ -46,25 +47,6 @@ namespace ZURA
         }
         // todo:add overwriting
         // this file should only be called IN STATIC CONTEXT THROUGH SCOPES, aka why the name has a prefix of s_
-        static void s_createFile(std::string fileName, bool overwrite = false)
-        {
-            std::fstream fileExists(fileName);
-            if (fileExists.is_open())
-            {
-                std::cout << "File: " << fileName << " already exists." << std::endl;
-                fileExists.close();
-                if (overwrite)
-                {
-                    std::cout << "Overwriting File: " << fileName << std::endl;
-                    std::ofstream createFile(fileName);
-                }
-            }
-            else
-            {
-                std::cout << "Creating file: " << fileName << std::endl;
-                std::ofstream createFile(fileName);
-            }
-        }
         template <typename T>
         void writeFile(T write)
         {
@@ -99,15 +81,52 @@ namespace ZURA
         {
             File.close();
         }
+        // STATICS, statics with s_ should not be used with a object.
+        static void s_createFile(std::string fileName, bool overwrite = false)
+        {
+            std::fstream fileExists(fileName);
+            if (fileExists.is_open())
+            {
+                std::cout << "File: " << fileName << " already exists." << std::endl;
+                fileExists.close();
+                if (overwrite)
+                {
+                    std::cout << "Overwriting File: " << fileName << std::endl;
+                    std::ofstream createFile(fileName);
+                }
+            }
+            else
+            {
+                std::cout << "Creating file: " << fileName << std::endl;
+                std::ofstream createFile(fileName);
+            }
+        }
+        // add better error codes for when file fails to delete
+        //  idk why im using a C library for this but whatever might fix later but this works for now lleoeoeoeleleol
+        static void s_deleteFile(const char *deleteFile)
+        {
+            if (std::remove(deleteFile) == 0)
+            {
+                std::cout << "File: " << deleteFile << " deleted successfully!" << std::endl;
+            }
+            else
+            {
+                std::cout << "Error deleting file" << deleteFile << std::endl;
+                return;
+            }
+        }
     };
 }
 
 int main()
 {
     // std::vector<std::string> testVec;
+    /*
     std::vector<std::string> testvec;
     ZURA::fileOperations files;
     files.openfile("joemomma.txt");
     files.readFileAll(testvec);
     std::cout << testvec[0];
+    */
+    ZURA::fileOperations::s_deleteFile("joemomma.txt");
 }
