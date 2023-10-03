@@ -19,7 +19,7 @@ namespace ZURA
     {
     private:
         std::string file;
-        std::fstream outputFile;
+        std::fstream File;
         bool successfulFileOpen = false;
 
     public:
@@ -35,8 +35,8 @@ namespace ZURA
             {
                 file = filename;
             }
-            outputFile.open(file);
-            if (!outputFile.is_open())
+            File.open(file);
+            if (!File.is_open())
             {
                 std::cout << "Failed to open file: " << file;
                 return;
@@ -73,26 +73,31 @@ namespace ZURA
                 std::cout << "must insert file name, or file wasnt opened properly. Cant perform operation" << std::endl;
                 return;
             }
-            outputFile << write << std::endl;
+            File << write << std::endl;
         }
         // i think i might simplify this function, make it to where the user will manually track how many lines themselves?
         // or create another readFile, readFileAll, that reads ALL data into variable
-        std::string readFile(int startingLine = 0)
+
+        // this is only really meant for vectors, lists, and others with a push_back()
+        // need to make this a little bit easier to use widely, maybe operator override and use a stream operator
+        template <typename T>
+        void readFileAll(T &container)
         {
+            std::string temp;
             if (successfulFileOpen == false)
             {
                 std::cout << "must insert file name, or file wasnt opened properly. Cant perform operation" << std::endl;
                 return;
             }
-            while (linesRead < numOfLinesToRead && std::getline(outputFile, readInto))
+            while (std::getline(File, temp))
             {
-                linesRead++;
+                container.push_back(temp);
             }
         }
 
         void closeFile()
         {
-            outputFile.close();
+            File.close();
         }
     };
 }
@@ -100,9 +105,9 @@ namespace ZURA
 int main()
 {
     // std::vector<std::string> testVec;
+    std::vector<std::string> testvec;
     ZURA::fileOperations files;
-    // files.openfile("test.txt", false);
-    //  files.readFile(testVec, true);
-    ZURA::fileOperations::s_createFile("joemomma.txt");
-    files.s_createFile("joebiden.txt");
+    files.openfile("joemomma.txt");
+    files.readFileAll(testvec);
+    std::cout << testvec[0];
 }
