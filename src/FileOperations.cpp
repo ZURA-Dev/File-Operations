@@ -9,6 +9,9 @@
 // make a create file option, while also checking for duplicates, asking if user wants overwrite, and if not ask user to change name of file.
 // add a benchmark function, this function creates a file, opens file, loads it full of data, and reads data into memory, in each step it benchmarks how long it takes to do each step
 // create another benchmark, this will be a streaming benchmark grabbing one line of file from one file, one from another file, comparing or sorting then restoring it? not sure but ill figure it out
+
+// add a delete file operation
+// add a rename file operation
 namespace ZURA
 {
 
@@ -16,7 +19,7 @@ namespace ZURA
     {
     private:
         std::string file;
-        std::ofstream outputFile;
+        std::fstream outputFile;
         bool successfulFileOpen = false;
 
     public:
@@ -42,13 +45,19 @@ namespace ZURA
             successfulFileOpen = true;
         }
         // todo:add overwriting
-        static void createFile(std::string fileName, bool overwrite = false)
+        // this file should only be called IN STATIC CONTEXT THROUGH SCOPES, aka why the name has a prefix of s_
+        static void s_createFile(std::string fileName, bool overwrite = false)
         {
-            std::ifstream fileExists(fileName);
+            std::fstream fileExists(fileName);
             if (fileExists.is_open())
             {
                 std::cout << "File: " << fileName << " already exists." << std::endl;
                 fileExists.close();
+                if (overwrite)
+                {
+                    std::cout << "Overwriting File: " << fileName << std::endl;
+                    std::ofstream createFile(fileName);
+                }
             }
             else
             {
@@ -68,9 +77,7 @@ namespace ZURA
         }
         // i think i might simplify this function, make it to where the user will manually track how many lines themselves?
         // or create another readFile, readFileAll, that reads ALL data into variable
-        template <typename T>
-        /*
-        T readFile(int startingLine = 0)
+        std::string readFile(int startingLine = 0)
         {
             if (successfulFileOpen == false)
             {
@@ -81,7 +88,8 @@ namespace ZURA
             {
                 linesRead++;
             }
-        }*/
+        }
+
         void closeFile()
         {
             outputFile.close();
@@ -92,8 +100,9 @@ namespace ZURA
 int main()
 {
     // std::vector<std::string> testVec;
-    // ZURA::fileOperations files;
+    ZURA::fileOperations files;
     // files.openfile("test.txt", false);
     //  files.readFile(testVec, true);
-    ZURA::fileOperations::createFile("joemomma.txt", false);
+    ZURA::fileOperations::s_createFile("joemomma.txt");
+    files.s_createFile("joebiden.txt");
 }
