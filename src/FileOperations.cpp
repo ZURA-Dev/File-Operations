@@ -19,12 +19,26 @@ namespace ZURA
     class fileOperations
     {
     private:
-        std::string file;
+        std::string file; // this isnt initialzied so i initialized it with the constructor, other way is just doing std::string file = std::string();
         std::fstream File;
         bool successfulFileOpen = false;
+        int fileLines = 0;
 
     public:
-        void openfile(std::string filename = "", bool manualInput = false)
+        fileOperations() : file() {}
+        fileOperations(std::string openFile)
+            : file(openFile) // Initialize the 'file' member in the member initializer list
+        {
+            openfile(file); // Call the 'openfile' member function after initializing 'file'
+        }
+        ~fileOperations()
+        {
+            if (File.is_open())
+            {
+                File.close();
+            }
+        }
+        void openfile(std::string filename = "", bool manualInput = false /*for inputting file name in terminal*/)
         {
             if (manualInput == true)
             {
@@ -48,14 +62,22 @@ namespace ZURA
         // todo:add overwriting
         // this file should only be called IN STATIC CONTEXT THROUGH SCOPES, aka why the name has a prefix of s_
         template <typename T>
-        void writeFile(T write)
+        fileOperations &operator<<(T &data)
         {
-            if (successfulFileOpen == false)
+            if (File.is_open())
             {
-                std::cout << "must insert file name, or file wasnt opened properly. Cant perform operation" << std::endl;
+                File << data;
+            }
+            else
+            {
+                cout << "Error writing to file, make sure file is open." << endl;
                 return;
             }
-            File << write << std::endl;
+        }
+        template <typename T>
+        fileOperations &operator>>(T &data)
+        {
+            readFileAll(data);
         }
         // i think i might simplify this function, make it to where the user will manually track how many lines themselves?
         // or create another readFile, readFileAll, that reads ALL data into variable
