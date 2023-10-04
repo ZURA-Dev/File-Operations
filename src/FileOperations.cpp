@@ -6,6 +6,7 @@
 // for testing delete later
 #include <vector>
 // todos
+// !!!!! add end of file function, detecting if end of file has been reached
 // add a option for the user to read files into a hashmap? or read into multiple variables if seperated by like a :
 // make a create file option, while also checking for duplicates, asking if user wants overwrite, and if not ask user to change name of file.
 // add a benchmark function, this function creates a file, opens file, loads it full of data, and reads data into memory, in each step it benchmarks how long it takes to do each step
@@ -13,12 +14,15 @@
 
 // add a delete file operation
 // add a rename file operation
+// recreate my own way to check if file is open by checking streams
+// figure out how to stream a file from scratch
+// add a way to add file in a specific directory, and also open a file from a specific directory
 namespace ZURA
 {
 
     class fileOperations
     {
-    private:
+    protected:
         std::string file; // this isnt initialzied so i initialized it with the constructor, other way is just doing std::string file = std::string();
         std::fstream File;
         bool successfulFileOpen = false;
@@ -67,17 +71,16 @@ namespace ZURA
             if (File.is_open())
             {
                 File << data;
+                return data;
             }
             else
             {
-                cout << "Error writing to file, make sure file is open." << endl;
-                return;
+                std::cout << "Error writing to file, make sure file is open." << std::endl;
             }
         }
         template <typename T>
         fileOperations &operator>>(T &data)
         {
-            readFileAll(data);
         }
         // i think i might simplify this function, make it to where the user will manually track how many lines themselves?
         // or create another readFile, readFileAll, that reads ALL data into variable
@@ -93,7 +96,7 @@ namespace ZURA
                 std::cout << "must insert file name, or file wasnt opened properly. Cant perform operation" << std::endl;
                 return;
             }
-            while (std::getline(File, temp))
+            while (std::getline(File, temp) && !File.eof())
             {
                 container.push_back(temp);
             }
@@ -121,6 +124,7 @@ namespace ZURA
             {
                 std::cout << "Creating file: " << fileName << std::endl;
                 std::ofstream createFile(fileName);
+                fileExists.close();
             }
         }
         // add better error codes for when file fails to delete
@@ -137,18 +141,8 @@ namespace ZURA
                 return;
             }
         }
+        static bool s_checkifopen(std::string fileName)
+        {
+        }
     };
-}
-
-int main()
-{
-    // std::vector<std::string> testVec;
-    /*
-    std::vector<std::string> testvec;
-    ZURA::fileOperations files;
-    files.openfile("joemomma.txt");
-    files.readFileAll(testvec);
-    std::cout << testvec[0];
-    */
-    ZURA::fileOperations::s_deleteFile("joemomma.txt");
 }
